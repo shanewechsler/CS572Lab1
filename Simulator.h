@@ -1,26 +1,52 @@
 #ifndef SIMULATOR_H
 #define SIMULATOR_H
 
+#define USER_TEXT_BASE  0x00400000
+#define USER_DATA_BASE  0x01000000
+
 #include <stack>
+#include <string>
+#include <fstream>
+#include <map>
 
 class Memory{
     private:
         unsigned int baseAddress;
         
-        unsigned int memoryEntries[256];
+        int memoryEntries[1024];
 
     public:
+        Memory(){
+            this->baseAddress = 0x0;
+        }
+
         Memory(unsigned int baseAddress){
             this->baseAddress = baseAddress;
         };
 
+        unsigned int getBaseAddress();
+
         unsigned int ReadAddress(unsigned int address);
 
-        void WriteToAddress(unsigned int word, unsigned int address);
+        void WriteToAddress(int word, unsigned int address);
 
         unsigned int ConvertAddressToIndex(unsigned int address);
 
         unsigned int ConvertIndexToAddress(unsigned int index);
 };
 
+class DataLoader{
+    private:
+        std::map<std::string, unsigned int> dataMappings;
+
+    public:
+        void loadData(Memory &data, std::string variableName, unsigned int address, unsigned int value);
+
+        unsigned int getMapping(std::string variableName);
+    
+};
+
+class InstrLoader{
+
+};
 #endif //SIMULATOR_H

@@ -1,18 +1,20 @@
 #include "Simulator.h"
 #include <iostream>
 
-#define USER_DATA_BASE  0x10000000
 
 int main(){
     Memory TEST = Memory(USER_DATA_BASE);
 
-    TEST.WriteToAddress(0x1F, 0x10000000);
-    TEST.WriteToAddress(0x2F, 0x10000004);
-    TEST.WriteToAddress(0x3F, 0x10000008);
-    TEST.WriteToAddress(0x4F, 0x1000000C);
+    DataLoader dataMem = DataLoader();
 
-    std::cout << TEST.ReadAddress(0x10000000) << std::endl;
-    std::cout << TEST.ReadAddress(0x10000004) << std::endl;
-    std::cout << TEST.ReadAddress(0x10000008) << std::endl;
-    std::cout << TEST.ReadAddress(0x1000000C) << std::endl;
+    dataMem.loadData(TEST,"X", USER_DATA_BASE, 0x3);
+    dataMem.loadData(TEST,"A", USER_DATA_BASE+4, 0x7);
+    dataMem.loadData(TEST, "B", USER_DATA_BASE+8, 0x5);
+    dataMem.loadData(TEST, "C", USER_DATA_BASE+12, 0x4);
+
+    std::cout << dataMem.getMapping("X") << std::endl;
+    std::cout << TEST.ReadAddress(USER_DATA_BASE) << std::endl;
+    std::cout << TEST.ReadAddress(dataMem.getMapping("A")) << std::endl;
+    std::cout << TEST.ReadAddress(dataMem.getMapping("B")) << std::endl;
+    std::cout << TEST.ReadAddress(dataMem.getMapping("C")) << std::endl;
 }
