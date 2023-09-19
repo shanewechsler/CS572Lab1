@@ -1,9 +1,12 @@
 #include <stack>
 #include <vector>
 #include <iostream>
+#include <cstring>
+#include <string>
 #include "Simulator.h"
 
-Memory userText = Memory(USER_TEXT_BASE);
+using namespace std;
+
 Memory userData = Memory(USER_DATA_BASE);
 
 std::stack<int> userStack;
@@ -51,31 +54,90 @@ bool MUL(){
     }
 }
 
-int main(){
+unsigned int InstructionMode(char *accumInst){
+    if(strcmp(accumInst,"push") == 0){
+        return 0;
+    }else if(strcmp(accumInst, "pop") == 0){
+        return 1;
+    }else if(strcmp(accumInst, "add") == 0){
+        return 2;
+    }else if(strcmp(accumInst, "mul") == 0){
+        return 3;
+    }else{
+        return 4;
+    }
+}
+
+int main(int argc, char **argv){
     DataLoader dataM = DataLoader();
 
-    dataM.loadData(userData, "X", USER_DATA_BASE, 0x3);
-    dataM.loadData(userData, "A", USER_DATA_BASE+4, 0x7);
-    dataM.loadData(userData, "B", USER_DATA_BASE+8, 0x5);
-    dataM.loadData(userData, "C", USER_DATA_BASE+12, 0x4);
+    bool dataMode = false;
 
-    unsigned int X = dataM.getMapping("X");
-    unsigned int A = dataM.getMapping("A");
-    unsigned int B = dataM.getMapping("B");
-    unsigned int C = dataM.getMapping("C");
+    ifstream codeFile(argv[1]);
 
-    PUSH(X);
-    PUSH(X);
-    MUL();
-    PUSH(A);
-    MUL();
-    PUSH(B);
-    PUSH(X);
-    MUL();
-    ADD();
-    PUSH(C);
-    ADD();
-    POP(USER_DATA_BASE+16);
+    string instruction;
 
-    std::cout << userData.ReadAddress(USER_DATA_BASE+16) << std::endl;
+    const char *delimiters = " \t\r\n\v\f ./:";
+
+    while(getline(codeFile, instruction)){
+        char instr_c[instruction.length()];
+        char *operands[2];
+
+        /*converts ctring line into c string */
+        strcpy(instr_c, instruction.c_str());
+
+        char *newToken = strtok(instr_c, delimiters);
+        char *instr;
+        char *operand;
+
+        int i = 0;
+        while(newToken != nullptr && i < 2){
+            operands[i] = newToken;
+            newToken = strtok(NULL, delimiters);
+            i++;
+        }
+        
+        switch(i){
+            case 0:
+                continue;
+            case 1:
+                if(strcmp(operands[0], "data") == 0){
+                    dataMode = true;
+                    continue;
+                }else if(strcmp(operands[0], "text") == 0){
+                    dataMode = false;
+                    continue;
+                }else{
+                    instr = operands[1];
+                }
+            case 2:
+                instr = operands[0];
+                operand = operands[1];
+        }
+
+        if(dataMode){
+            dataM.storeData(userData, instr, atoi(operand));
+        }else{
+            unsigned int address;
+            switch(InstructionMode(instr)){
+                case 0:
+                    address = dataM.getMapping(operand);
+                    PUSH(address);
+                    break;
+                case 1:
+                    address = dataM.getMapping(operand);
+                    POP(address);
+                    break;
+                case 2:
+                    ADD();
+                    break;
+                case 3:
+                    MUL();
+                    break;
+                case 4:
+                    break;
+            }
+        }
+    }
+    cout << userStack.top() << endl;
 }

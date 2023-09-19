@@ -1,10 +1,14 @@
 #include "Simulator.h"
 #include <iostream>
+#include <fstream>
+#include <string>
+#include <cstring>
 
-Memory userText = Memory(USER_TEXT_BASE);
 Memory userData = Memory(USER_DATA_BASE);
 
 int accumulator;
+
+using namespace std;
 
 void LOAD(unsigned int address){
     accumulator = userData.ReadAddress(address);
@@ -22,31 +26,97 @@ void MUL(unsigned int address){
     accumulator *= userData.ReadAddress(address);
 }
 
-int main(){
+unsigned int InstructionMode(char *accumInst){
+    if(strcmp(accumInst,"load") == 0){
+        return 0;
+    }else if(strcmp(accumInst, "sto") == 0){
+        return 1;
+    }else if(strcmp(accumInst, "add") == 0){
+        return 2;
+    }else if(strcmp(accumInst, "mul") == 0){
+        return 3;
+    }else{
+        return 4;
+    }
+}
+
+int main(int argc, char **argv){
     DataLoader dataM = DataLoader();
 
-    dataM.loadData(userData, "X", USER_DATA_BASE, 0x3);
-    dataM.loadData(userData, "A", USER_DATA_BASE+4, 0x7);
-    dataM.loadData(userData, "B", USER_DATA_BASE+8, 0x5);
-    dataM.loadData(userData, "C", USER_DATA_BASE+12, 0x4);
-    dataM.loadData(userData, "D", USER_DATA_BASE+16, 0x0);
+    bool dataMode = false;
 
-    unsigned int X = dataM.getMapping("X");
-    unsigned int A = dataM.getMapping("A");
-    unsigned int B = dataM.getMapping("B");
-    unsigned int C = dataM.getMapping("C");
-    unsigned int D = dataM.getMapping("D");
+    ifstream codeFile(argv[1]);
 
-    LOAD(X);
-    MUL(X);
-    MUL(A);
-    STO(D);
-    LOAD(B);
-    MUL(X);
-    ADD(C);
-    ADD(D);
-    STO(D);
+    string instruction;
 
-    std::cout << userData.ReadAddress(D) << std::endl;
+    const char *delimiters = " \t\r\n\v\f ./:";
+
+    while(getline(codeFile, instruction)){
+        char instr_c[instruction.length()];
+        char *operands[2];
+
+        /*converts ctring line into c string */
+        strcpy(instr_c, instruction.c_str());
+
+        char *newToken = strtok(instr_c, delimiters);
+        char *instr;
+        char *operand;
+
+        int i = 0;
+        while(newToken != nullptr && i < 2){
+            operands[i] = newToken;
+            newToken = strtok(NULL, delimiters);
+            i++;
+        }
+        
+        switch(i){
+            case 0:
+                continue;
+            case 1:
+                if(strcmp(operands[0], "data") == 0){
+                    dataMode = true;
+                    continue;
+                }else{
+                    dataMode = false;
+                    continue;
+                }
+            case 2:
+                instr = operands[0];
+                operand = operands[1];
+        }
+
+        if(dataMode){
+            dataM.storeData(userData, instr, atoi(operand));
+        }else{
+            unsigned int address = dataM.getMapping(operand);
+            switch(InstructionMode(instr)){
+                case 0:
+                    LOAD(address);
+                    break;
+                case 1:
+                    STO(address);
+                    break;
+                case 2:
+                    ADD(address);
+                    break;
+                case 3:
+                    MUL(address);
+                    break;
+                case 4:
+                    break;
+            }
+        }
+    }
+
+    cout << accumulator << endl;
+    //LOAD(X);
+    // MUL(X);
+    // MUL(A);
+    // STO(D);
+    // LOAD(B);
+    // MUL(X);
+    // ADD(C);
+    // ADD(D);
+    // STO(D);
 
 }

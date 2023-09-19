@@ -1,4 +1,5 @@
 #include "Simulator.h"
+#include <cstring>
 
 unsigned int Memory::ReadAddress(unsigned int address){
     unsigned int index = ConvertAddressToIndex(address);
@@ -22,9 +23,11 @@ unsigned int Memory::getBaseAddress(){
     return this->baseAddress;
 }
 
-void DataLoader::loadData(Memory &data, std::string variableName, unsigned int address, unsigned int value){
+void DataLoader::storeData(Memory &data, std::string variableName, unsigned int value){
+    unsigned int address = data.getBaseAddress() + (wordsInMem * 4);
     this->dataMappings[variableName] = address;
     data.WriteToAddress(value, address);
+    wordsInMem++;
 }
 
 unsigned int DataLoader::getMapping(std::string variableName){

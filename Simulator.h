@@ -39,14 +39,15 @@ class DataLoader{
     private:
         std::map<std::string, unsigned int> dataMappings;
 
+        unsigned int wordsInMem = 0;
+
+        const char *delimiters = " \t\r\n\v\f ./:";
+
     public:
-        void loadData(Memory &data, std::string variableName, unsigned int address, unsigned int value);
+        void storeData(Memory &data, std::string variableName, unsigned int value);
 
         unsigned int getMapping(std::string variableName);
     
 };
 
-class InstrLoader{
-
-};
 #endif //SIMULATOR_H
