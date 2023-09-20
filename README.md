@@ -15,7 +15,7 @@ REDID: 823526399
 makefile provided
 run command `make` to compile all targets
 
-# #Running the code:
+## Running the code:
 ./accumSim accumCode.s
 
 ## How it works:
