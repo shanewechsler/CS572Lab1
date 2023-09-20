@@ -1,23 +1,24 @@
-# Shane Wechsler
-# REDID: 823526399
+# Author
+Shane Wechsler
+REDID: 823526399
 
-## accumSim
+# accumSim
 
-# Dependencies: 
+## Dependencies: 
 
 * `Simulator.h`
 * `Simulator.cpp`
 * `accumSim.cpp`
 
-# Compilation:
+## Compilation:
 
 makefile provided
 run command `make` to compile all targets
 
-# Running the code:
+# #Running the code:
 ./accumSim accumCode.s
 
-# How it works:
+## How it works:
 
 Based on 5 accumulator instuctions, and MIPS formatting.
 LOAD X -> loads value at address `X` into accumulator.
@@ -31,21 +32,21 @@ Uses ascii encoded instructions to direct memory store and instruction handling.
 `.data` signifies data mode, we read the next lines as variable names and values, and store them in user data.
 `.text` signifies instruction mode, we read the next lines after as instructions, and use the variable names as mappings(second operands) and instruction codes as directives(first operands)
 
-## stackSim
+# stackSim
 
 * `Simulator.h`
 * `Simulator.cpp`
 * `stackSim.cpp`
 
-# Compilaion:
+## Compilaion:
 
 makefile provided
 run command `make` to compile all targets
 
-# Running the code:
+## Running the code:
 ./stackSim stackCode.s
 
-# How it works:
+## How it works:
 
 Based on 5 accumulator instuctions, and MIPS formatting.
 PUSH X -> push the value at address `X` to the stack.
