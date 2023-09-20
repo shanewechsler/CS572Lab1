@@ -1,3 +1,6 @@
+# Shane Wechsler
+# REDID: 823526399
+
 ## accumSim
 
 # Dependencies: 

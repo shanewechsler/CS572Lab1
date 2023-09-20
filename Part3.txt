@@ -103,3 +103,5 @@ add $t4, $t4, $t3  # A*X**2 + B*X + C                       4
                                                             TOTAL:
                                                             52
 
+Even with smaller formatting for some accumulator/stack instructions, MIPS beats both in terms of byte size.  
+

@@ -58,7 +58,7 @@ int main(int argc, char **argv){
         /*converts ctring line into c string */
         strcpy(instr_c, instruction.c_str());
 
-        char *newToken = strtok(instr_c, delimiters);
+        char *newToken = strtok(instr_c, delimiters); //splits the new line into operands
         char *instr;
         char *operand;
 
@@ -70,9 +70,9 @@ int main(int argc, char **argv){
         }
         
         switch(i){
-            case 0:
+            case 0: //nothing in the line, read the next line
                 continue;
-            case 1:
+            case 1: //only one "operand" found must be .data or .text
                 if(strcmp(operands[0], "data") == 0){
                     dataMode = true;
                     continue;
@@ -81,12 +81,12 @@ int main(int argc, char **argv){
                     continue;
                 }
             case 2:
-                instr = operands[0];
+                instr = operands[0]; //instruction comes before operand
                 operand = operands[1];
         }
 
         if(dataMode){
-            dataM.storeData(userData, instr, atoi(operand));
+            dataM.storeData(userData, instr, atoi(operand)); //uses "instr" as the variable name, and the operand as the immediate value
         }else{
             unsigned int address = dataM.getMapping(operand);
             switch(InstructionMode(instr)){
