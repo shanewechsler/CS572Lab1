@@ -28,15 +28,15 @@ void MUL(unsigned int address){
 
 unsigned int InstructionMode(char *accumInst){
     if(strcmp(accumInst,"load") == 0){
-        return 0;
+        return LOAD_SIG;
     }else if(strcmp(accumInst, "sto") == 0){
-        return 1;
+        return STO_SIG;
     }else if(strcmp(accumInst, "add") == 0){
-        return 2;
+        return ADD_SIG;
     }else if(strcmp(accumInst, "mul") == 0){
-        return 3;
+        return MUL_SIG;
     }else{
-        return 4;
+        return END_SIG;
     }
 }
 
@@ -90,25 +90,26 @@ int main(int argc, char **argv){
         }else{
             unsigned int address = dataM.getMapping(operand);
             switch(InstructionMode(instr)){
-                case 0:
+                case LOAD_SIG:
                     LOAD(address);
                     break;
-                case 1:
+                case STO_SIG:
                     STO(address);
                     break;
-                case 2:
+                case ADD_SIG:
                     ADD(address);
                     break;
-                case 3:
+                case MUL_SIG:
                     MUL(address);
                     break;
-                case 4:
+                case END_SIG:
                     break;
             }
         }
+
     }
 
-    cout << accumulator << endl;
+    cout << "Result: " << userData.ReadAddress(dataM.getMapping("D")) << endl;
     //LOAD(X);
     // MUL(X);
     // MUL(A);

@@ -12,11 +12,11 @@ void Memory::WriteToAddress(int word, unsigned int address){
 }
 
 unsigned int Memory::ConvertAddressToIndex(unsigned int address){
-    return address - this->baseAddress >> 2;
+    return (address - this->baseAddress) >> 2;
 }
 
 unsigned int Memory::ConvertIndexToAddress(unsigned int index){
-    return index + this->baseAddress << 2;
+    return (index + this->baseAddress) << 2;
 }
 
 unsigned int Memory::getBaseAddress(){

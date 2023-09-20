@@ -56,15 +56,15 @@ bool MUL(){
 
 unsigned int InstructionMode(char *accumInst){
     if(strcmp(accumInst,"push") == 0){
-        return 0;
+        return PUSH_SIG;
     }else if(strcmp(accumInst, "pop") == 0){
-        return 1;
+        return POP_SIG;
     }else if(strcmp(accumInst, "add") == 0){
-        return 2;
+        return ADD_SIG;
     }else if(strcmp(accumInst, "mul") == 0){
-        return 3;
+        return MUL_SIG;
     }else{
-        return 4;
+        return END_SIG;
     }
 }
 
@@ -120,24 +120,24 @@ int main(int argc, char **argv){
         }else{
             unsigned int address;
             switch(InstructionMode(instr)){
-                case 0:
+                case PUSH_SIG:
                     address = dataM.getMapping(operand);
                     PUSH(address);
                     break;
-                case 1:
+                case POP_SIG:
                     address = dataM.getMapping(operand);
                     POP(address);
                     break;
-                case 2:
+                case ADD_SIG:
                     ADD();
                     break;
-                case 3:
+                case MUL_SIG:
                     MUL();
                     break;
-                case 4:
+                case END_SIG:
                     break;
             }
         }
     }
-    cout << userStack.top() << endl;
+    cout << "Result: " << userData.ReadAddress(dataM.getMapping("D")) << endl;
 }

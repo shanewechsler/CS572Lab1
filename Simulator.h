@@ -4,6 +4,15 @@
 #define USER_TEXT_BASE  0x00400000
 #define USER_DATA_BASE  0x01000000
 
+#define PUSH_SIG 0
+#define POP_SIG 1
+#define LOAD_SIG 0 
+#define STO_SIG 1
+
+#define ADD_SIG 2 
+#define MUL_SIG 3
+#define END_SIG 4
+
 #include <stack>
 #include <string>
 #include <fstream>
@@ -48,6 +57,10 @@ class DataLoader{
 
         unsigned int getMapping(std::string variableName);
     
+};
+
+class BinaryTranslator{
+
 };
 
 #endif //SIMULATOR_H

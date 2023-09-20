@@ -3,6 +3,7 @@ X:	3
 A:	7
 B:	5
 C:	4
+D:	0
 
 	.text
 	push X
@@ -16,4 +17,5 @@ C:	4
 	add
 	push C
 	add
+	pop D
 	end
