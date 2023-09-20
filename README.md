@@ -16,7 +16,7 @@ makefile provided
 run command `make` to compile all targets
 
 ## Running the code:
-./accumSim accumCode.s
+`./accumSim accumCode.s`
 
 ## How it works:
 
@@ -44,7 +44,7 @@ makefile provided
 run command `make` to compile all targets
 
 ## Running the code:
-./stackSim stackCode.s
+`./stackSim stackCode.s`
 
 ## How it works:
 
