@@ -47,8 +47,8 @@ run command `make` to compile all targets
 Based on 5 accumulator instuctions, and MIPS formatting.
 PUSH X -> push the value at address `X` to the stack.
 POP Y -> pop the value at the top of the stack and store it to address `Y`
-ADD X -> pops the top 2 values of the stack, adds them, and then stores the result at the top of the stack.
-MUL X -> pops the top 2 vales of the stack, multiplies them, and then stores the result at the top of the stack.
+ADD -> pops the top 2 values of the stack, adds them, and then stores the result at the top of the stack.
+MUL -> pops the top 2 vales of the stack, multiplies them, and then stores the result at the top of the stack.
 END -> signifies the end of code, stop reading instructions.
 
 PARSING:

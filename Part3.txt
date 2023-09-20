@@ -1,0 +1,105 @@
+# STACK CODES:
+
+8 bit codes, 32 bit addresses
+
+FORMAT 1:
+ASCII:          OPCODE:             OPERAND:
+PUSH `X`        0x00                0x00000000(address)
+PUSH IMMEDIATE  0x01                0x00000000(immediate value)
+POP `Y`         0x02                0x00000000(address)
+
+FORMAT 2:
+ASCII:          OPCODE:
+ADD             0x03                 
+MUL             0x04
+END             0x05
+
+
+Quadratic Evaluator(stack version)
+
+ASCII:                  HEX:                                BYTE COUNT:                         
+X:  3                   value 0x03 ->  address 0x01000000   4
+A:  7                   value 0x07 ->  address 0x01000004   4
+B:  5                   value 0x05 ->  address 0x01000008   4
+C:  4                   value 0x04 ->  address 0x0100000C   4
+D:  0                   value 0x00 ->  address 0x01000010   4
+
+PUSH X                  0x0001000000                        5
+PUSH X                  0x0001000000                        5
+MUL                     0x04                                1
+PUSH A                  0x0001000004                        5                 
+MUL                     0x04                                1         
+PUSH B                  0x0001000008                        5
+PUSH X                  0x0001000000                        5
+MUL                     0x04                                1
+ADD                     0x03                                1
+PUSH C                  0x000100000C                        5
+ADD                     0x03                                1
+POP D                   0x0201000010                        5
+END                     0x05                                1
+
+                                                            TOTAL:
+                                                            61             
+
+# ACCUM CODES:
+
+8 bit codes, 32 bit addresses
+
+FORMAT 1:
+ASCII:          OPCODE:             OPERAND:
+LOAD `X`        0x00                0x00000000(address)
+LOAD IMMEDIATE  0x01                0x00000000(immediate value)
+STO `Y`         0x02                0x00000000(address)
+ADD `X`         0x03                0x00000000(address)
+MUL `X`         0x04                0x00000000(address)
+
+FORMAT 2:
+ASCII:          OPCODE:
+END             0X05      
+                     
+
+Quadratic Evaluator(accumulator version)
+
+ASCII:                  HEX:                                BYTE COUNT:
+X:  3                   value 0x03 ->  address 0x01000000   4
+A:  7                   value 0x07 ->  address 0x01000004   4
+B:  5                   value 0x05 ->  address 0x01000008   4
+C:  4                   value 0x04 ->  address 0x0100000C   4
+D:	0                   value 0x00 ->  address 0x01000010   4
+
+LOAD X                  0x0001000000                        5                    
+MUL X                   0x0401000000                        5
+MUL A                   0x0401000004                        5
+STO D                   0x0201000010                        5
+LOAD B                  0x0001000008                        5
+MUL X                   0x0401000000                        5
+ADD C                   0x030100000C                        5
+ADD D                   0x0301000010                        5
+STO D                   0x0201000010                        5
+END                     0x05                                1
+
+                                                            TOTAL:
+                                                            66
+
+# MIPS CODE:
+
+ASCII:                                                      BYTE COUNT:
+X:	.word 3                                                 4
+A:	.word 7                                                 4
+B:	.word 5                                                 4
+C:	.word 4                                                 4
+
+lw $t0, X                                                   4
+lw $t1, A                                                   4
+lw $t2, B                                                   4
+lw $t3, C                                                   4
+
+mul $t4, $t0, $t0  # X**2                                   4
+mul $t4, $t1, $t4  # A*X**2                                 4
+mul $t5, $t2, $t0  # B*X                                    4
+add $t4, $t5, $t4  # A*X**2 + B*X                           4
+add $t4, $t4, $t3  # A*X**2 + B*X + C                       4
+
+                                                            TOTAL:
+                                                            52
+
