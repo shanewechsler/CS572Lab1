@@ -5,6 +5,7 @@
 #include <cstring>
 
 Memory userData = Memory(USER_DATA_BASE);
+Memory userText = Memory(USER_TEXT_BASE);
 
 int accumulator;
 
@@ -26,22 +27,9 @@ void MUL(unsigned int address){
     accumulator *= userData.ReadAddress(address);
 }
 
-unsigned int InstructionMode(char *accumInst){
-    if(strcmp(accumInst,"load") == 0){
-        return LOAD_SIG;
-    }else if(strcmp(accumInst, "sto") == 0){
-        return STO_SIG;
-    }else if(strcmp(accumInst, "add") == 0){
-        return ADD_SIG;
-    }else if(strcmp(accumInst, "mul") == 0){
-        return MUL_SIG;
-    }else{
-        return END_SIG;
-    }
-}
-
 int main(int argc, char **argv){
     DataLoader dataM = DataLoader();
+    AccumAssembler assem = AccumAssembler();
 
     bool dataMode = false;
 
@@ -72,42 +60,57 @@ int main(int argc, char **argv){
         switch(i){
             case 0: //nothing in the line, read the next line
                 continue;
-            case 1: //only one "operand" found must be .data or .text
-                if(strcmp(operands[0], "data") == 0){
+            case 1: //only one "operand" found check if it's .data or .text, if not store no operand instr in userText
+                if(strcmp(operands[INSTR_IDX], "data") == 0){
                     dataMode = true;
                     continue;
-                }else{
+                }else if(strcmp(operands[INSTR_IDX], "text") == 0){
                     dataMode = false;
+                    continue;
+                }else{
+                    dataM.storeText(userText, assem.assembleCode(operands[INSTR_IDX]));
                     continue;
                 }
             case 2:
-                instr = operands[0]; //instruction comes before operand
-                operand = operands[1];
+                instr = operands[INSTR_IDX]; //instruction comes before operand
+                operand = operands[OPERAND_IDX];
         }
+
 
         if(dataMode){
             dataM.storeData(userData, instr, atoi(operand)); //uses "instr" as the variable name, and the operand as the immediate value
         }else{
-            unsigned int address = dataM.getMapping(operand);
-            switch(InstructionMode(instr)){
-                case LOAD_SIG:
-                    LOAD(address);
-                    break;
-                case STO_SIG:
-                    STO(address);
-                    break;
-                case ADD_SIG:
-                    ADD(address);
-                    break;
-                case MUL_SIG:
-                    MUL(address);
-                    break;
-                case END_SIG:
-                    break;
-            }
+            dataM.storeText(userText, assem.assembleCode(dataM, instr, operand)); //create machine code for instr and store in in userText
         }
-
     }
+
+    unsigned int PC = USER_TEXT_BASE;
+    bool userMode = true;
+    while(userMode){
+        unsigned long machineInstr = userText.ReadAddress(PC);
+        PC += 4;
+        unsigned int opcode = assem.machineToOp(machineInstr);
+        unsigned int address = assem.machineToAddress(machineInstr);
+        switch(opcode){
+            case LOAD_SIG:
+                LOAD(address);
+                break;
+            case STO_SIG:
+                STO(address);
+                break;
+            case ADD_SIG:
+                ADD(address);
+                break;
+            case MUL_SIG:
+                MUL(address);
+                break;
+            case END_SIG:
+                userMode = false;
+                break;
+        }
+    }
+
+
 
     cout << "Result: " << userData.ReadAddress(dataM.getMapping("D")) << endl;
     //LOAD(X);

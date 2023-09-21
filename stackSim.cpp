@@ -8,12 +8,14 @@
 using namespace std;
 
 Memory userData = Memory(USER_DATA_BASE);
+Memory userText = Memory(USER_TEXT_BASE);
 
 std::stack<int> userStack;
 
 void PUSH(unsigned int address){
     userStack.push(userData.ReadAddress(address));
 }
+
 
 bool POP(unsigned int address){
     if(!userStack.empty()){
@@ -54,22 +56,10 @@ bool MUL(){
     }
 }
 
-unsigned int InstructionMode(char *accumInst){
-    if(strcmp(accumInst,"push") == 0){
-        return PUSH_SIG;
-    }else if(strcmp(accumInst, "pop") == 0){
-        return POP_SIG;
-    }else if(strcmp(accumInst, "add") == 0){
-        return ADD_SIG;
-    }else if(strcmp(accumInst, "mul") == 0){
-        return MUL_SIG;
-    }else{
-        return END_SIG;
-    }
-}
 
 int main(int argc, char **argv){
     DataLoader dataM = DataLoader();
+    StackAssembler assem = StackAssembler();
 
     bool dataMode = false;
 
@@ -86,7 +76,7 @@ int main(int argc, char **argv){
         /*converts ctring line into c string */
         strcpy(instr_c, instruction.c_str());
 
-        char *newToken = strtok(instr_c, delimiters);
+        char *newToken = strtok(instr_c, delimiters); //splits the new line into operands
         char *instr;
         char *operand;
 
@@ -98,45 +88,55 @@ int main(int argc, char **argv){
         }
         
         switch(i){
-            case 0:
+            case 0: //nothing in the line, read the next line
                 continue;
-            case 1:
-                if(strcmp(operands[0], "data") == 0){
+            case 1: //only one "operand" found check if it's .data or .text, if not store no operand instr in userText
+                if(strcmp(operands[INSTR_IDX], "data") == 0){
                     dataMode = true;
                     continue;
-                }else if(strcmp(operands[0], "text") == 0){
+                }else if(strcmp(operands[INSTR_IDX], "text") == 0){
                     dataMode = false;
                     continue;
                 }else{
-                    instr = operands[1];
+                    dataM.storeText(userText, assem.assembleCode(operands[INSTR_IDX]));
+                    continue;
                 }
             case 2:
-                instr = operands[0];
-                operand = operands[1];
+                instr = operands[INSTR_IDX]; //instruction comes before operand
+                operand = operands[OPERAND_IDX];
         }
 
+
         if(dataMode){
-            dataM.storeData(userData, instr, atoi(operand));
+            dataM.storeData(userData, instr, atoi(operand)); //uses "instr" as the variable name, and the operand as the immediate value
         }else{
-            unsigned int address;
-            switch(InstructionMode(instr)){
-                case PUSH_SIG:
-                    address = dataM.getMapping(operand);
-                    PUSH(address);
-                    break;
-                case POP_SIG:
-                    address = dataM.getMapping(operand);
-                    POP(address);
-                    break;
-                case ADD_SIG:
-                    ADD();
-                    break;
-                case MUL_SIG:
-                    MUL();
-                    break;
-                case END_SIG:
-                    break;
-            }
+            dataM.storeText(userText, assem.assembleCode(dataM, instr, operand)); //create machine code for instr and store in in userText
+        }
+    }
+
+    unsigned int PC = USER_TEXT_BASE;
+    bool userMode = true;
+    while(userMode){
+        unsigned long machineInstr = userText.ReadAddress(PC);
+        PC += 4;
+        unsigned int opcode = assem.machineToOp(machineInstr);
+        unsigned int address = assem.machineToAddress(machineInstr);
+        switch(opcode){
+            case PUSH_SIG:
+                PUSH(address);
+                break;
+            case POP_SIG:
+                POP(address);
+                break;
+            case ADD_SIG:
+                ADD();
+                break;
+            case MUL_SIG:
+                MUL();
+                break;
+            case END_SIG:
+                userMode = false;
+                break;
         }
     }
     cout << "Result: " << userData.ReadAddress(dataM.getMapping("D")) << endl;
